@@ -134,3 +134,25 @@ JOIN dim_users as u ON u.dim_userId = r.userID;     -- Prepojenie na základe po
 ```
 
 
+
+---
+## **4 Vizualizácia dát**
+---
+### **Graf 1: Najviac hodnotené knihy (Top 10 kníh)**
+Táto vizualizácia zobrazuje počty hodnotení pre všetky filmy, vidíme že najčastejsie hodnotia používatelia filmy ratingom 3
+
+```sql
+SELECT 
+    m.title AS movie_title,
+    ROUND(AVG(r.rating), 2) AS avg_rating,
+FROM FACT_RATINGS r
+JOIN DIM_MOVIES m ON r.movieID = m.dim_movieId
+GROUP BY m.title
+ORDER BY avg_rating DESC;
+```
+
+
+
+
+
+
