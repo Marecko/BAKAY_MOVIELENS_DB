@@ -137,9 +137,17 @@ JOIN dim_users as u ON u.dim_userId = r.userID;     -- Prepojenie na základe po
 
 ---
 ## **4 Vizualizácia dát**
+<p align="center">DashBoard Obsahuje 6 vizualizácií ktoré nám objasňujú určité metriky našich dát
+
+  <img src="https://github.com/Marecko/BAKAY_MOVIELENS_DB/blob/main/grafy.png" alt="Star Schema">
+  <br>
+  <em>Obrázok 2 Schéma hviezdy pre MovieLens</em>
+</p>
+
 ---
 ### **Graf 1: Počty hodnotení filmov**
 Táto vizualizácia zobrazuje počty hodnotení pre všetky filmy, vidíme že najčastejsie hodnotia používatelia filmy ratingom 3
+ale hodnoty celočíselné 1,2,3,4,5 sú najčastejšie. Ludia taktiež skôr hodnotia pozitívne hodnotenie > 2,5(Neutrálny pocit z  filmu)
 
 ```sql
 SELECT 
@@ -152,7 +160,10 @@ ORDER BY avg_rating DESC;
 ```
 
 ### **Graf 2: Počty hodnotení použivatelov (Podla vekevej kategorie)**
-Táto vizualizácia zobrazuje počet hodnotení od používatelov rozdelené podla veku
+Táto vizualizácia zobrazuje počet hodnotení od používatelov rozdelené podla veku.
+Vidíme že najviac hodnotení majú používatelia vo veku 25-34 a najmenej hodnotení majú skupiny Under 18 a 55+
+
+
 
 ```sql
 SELECT 
@@ -174,7 +185,8 @@ ORDER BY
 ```
 
 ### **Graf 3: Najpopulárnejšie žánre (Podla Počtu hodnotení)**
-Táto vizualizácia zobrazuje počet hodnotení pre rozdielne žánre
+Táto vizualizácia zobrazuje počet hodnotení pre rozdielne žánre.
+Najviac hodnotení má žáner Action a úplne nakonci je Documentary
 
 ```sql
 SELECT 
@@ -191,6 +203,7 @@ ORDER BY total_ratings DESC;
 
 ### **Graf 4: Najpopulárnejšie žánre (Podla Počtu filmov)**
 Táto vizualizácia zobrazuje počet filmov pre rozdielne žánre
+Najviac sa vydáva filmov žanru Drama a najmenej Film-Noir
 
 ```sql
 SELECT 
@@ -208,6 +221,10 @@ ORDER BY total_ratings DESC;
 
 
 ### **Graf 5: Priemerný počet hodnotení pre film (Podľa žanrov)**
+V priemere sa najviac hodnotia filmy s žanrom Sci-Fi a najmenej v žanri Documentary
+Taktiež si môžme porovnať výsledky s iným grafmi a uvidíme že napriek tomu, že Drama ma najviac filmov
+tak v priemere má 237 hodnotení na film to ked porovnáme s Film-Noir ktorý má síce málo filmov 
+ale priemerný počet hodnotení je až 415.
 
 
 ```sql
@@ -226,7 +243,8 @@ ORDER BY avg_ratings_per_movie DESC;
 
 
 ### **Graf 6: Priemerné hodnotenie podla vekovej skupiny**
-
+Tento graf nám ukazuje priemernú hodnotu hodnotení podla vekovej skupiny. Hodnoty sa nelíšia významne,
+Môžme teda usúdiť že vek nemá velký vplyv na náročnosť hodnotenia.
 
 ```sql
 SELECT 
