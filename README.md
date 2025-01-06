@@ -76,3 +76,61 @@ A priame pridanie hodnôt pre tabulky genre, age, occupation
 ```sql
 INSERT INTO age_staging VALUES (1,'Under 18'),(18,'18-24'),(25,'25-34'),(35,'35-44'),(45,'45-49'),(50,'50-55'),(56,'56+');
 ```
+
+### **3.1 Transfor (Transformácia dát)**
+
+V tejto fáze boli dáta zo staging tabuliek vyčistené, transformované a obohatené. Hlavným cieľom bolo pripraviť dimenzie a faktovú tabuľku, ktoré umožnia jednoduchú a efektívnu analýzu.
+
+Dimenzie boli navrhnuté na poskytovanie kontextu pre faktovú tabuľku. `dim_users` obsahuje údaje o používateľoch vrátane vekových kategórií, pohlavia, zamestnania. Transformácia zahŕňala rozdelenie veku používateľov do kategórií (napr. „18-24“) a pridanie popisov zamestnaní a pohlavia
+```sql
+CREATE TABLE dim_users AS
+SELECT DISTINCT
+    u.userId AS dim_userId,
+    CASE 
+        WHEN u.age < 18 THEN 'Under 18'
+        WHEN u.age BETWEEN 18 AND 24 THEN '18-24'
+        WHEN u.age BETWEEN 25 AND 34 THEN '25-34'
+        WHEN u.age BETWEEN 35 AND 44 THEN '35-44'
+        WHEN u.age BETWEEN 45 AND 54 THEN '45-54'
+        WHEN u.age >= 55 THEN '55+'
+        ELSE 'Unknown'
+    END AS age_group,
+    CASE
+        WHEN u.gender = 'F' THEN 'FEMALE'
+        WHEN u.gender = 'M' THEN 'MALE'
+        ELSE 'Unknown'
+    END AS gender,
+    o.name AS occupation,
+FROM users_staging as u
+JOIN age_staging as a ON u.age = a.ageId
+JOIN occupation_staging as o ON o.occupationId = u.occupationId;
+```
+
+Dimenzia `dim_movies` obsahuje údaje o názve filmu, roku vydania, a druhu žanru
+```sql 
+-- dim_movies
+CREATE TABLE DIM_MOVIES AS
+SELECT DISTINCT
+    m.movieId AS dim_movieId,      
+    m.title AS title,       
+    m.release_year AS release_year,     
+    g.name AS Genre
+FROM movies_staging as m
+JOIN genre_movies_staging as gm ON m.movieId = gm.movieId
+JOIN genre_staging as g ON gm.genreId = g.genreId;
+```
+
+Faktová tabuľka `fact_ratings` obsahuje záznamy o hodnoteniach a prepojenia na všetky dimenzie. Obsahuje kľúčové metriky, ako je hodnota hodnotenia.
+```sql
+CREATE TABLE FACT_RATINGS AS
+SELECT 
+    r.ratingId AS fact_ratingID,    -- Unikátne ID hodnotenia
+    r.rating as rating,             -- Hodnota hodnotenia
+    u.dim_userid as userID,         -- Prepojenie s dimenziou používateľov
+    m.dim_movieId as movieID,       -- Prepojenie s dimenziou filmov
+FROM ratings_staging as r
+JOIN dim_movies as m ON m.dim_movieId = r.movieID   -- Prepojenie na základe filmu
+JOIN dim_users as u ON u.dim_userId = r.userID;     -- Prepojenie na základe používateľa
+```
+
+
