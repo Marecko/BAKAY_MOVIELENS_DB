@@ -28,7 +28,24 @@ Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na **e
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/29096dcd-d015-42ea-92cd-2532aca466ae" alt="ERD Schema">
+  <img src="https://github.com/Marecko/BAKAY_MOVIELENS_DB/blob/main/MovieLens_ERD.png" alt="ERD Schema">
   <br>
   <em>Obrázok 1 Entitno-relačná schéma MovieLens</em>
+</p>
+
+---
+## **2 Dimenzionálny model**
+
+Navrhnutý bol **hviezdicový model (star schema)**, pre efektívnu analýzu kde centrálny bod predstavuje faktová tabuľka **`fact_ratings`**, ktorá je prepojená s nasledujúcimi dimenziami:
+- **`dim_movie`**: Obsahuje podrobné informácie o knihách (názov, rok vydania, žáner).
+- **`dim_users`**: Obsahuje demografické údaje o používateľoch, ako sú vekové kategórie, pohlavie, povolanie a vzdelanie.
+- **`dim_date`**: Zahrňuje informácie o dátumoch hodnotení (deň, mesiac, rok).
+
+Štruktúra hviezdicového modelu je znázornená na diagrame nižšie. Diagram ukazuje prepojenia medzi faktovou tabuľkou a dimenziami, čo zjednodušuje pochopenie a implementáciu modelu.
+
+<p align="center">![star_schema_MovieLens](https://github.com/user-attachments/assets/55c6ac64-c17c-4ef2-910c-15300545f4f1)
+
+  <img src="https://github.com/Marecko/BAKAY_MOVIELENS_DB/blob/main/star_schema_MovieLens.png" alt="Star Schema">
+  <br>
+  <em>Obrázok 2 Schéma hviezdy pre MovieLens</em>
 </p>
