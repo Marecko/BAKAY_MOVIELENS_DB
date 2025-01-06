@@ -138,7 +138,7 @@ JOIN dim_users as u ON u.dim_userId = r.userID;     -- Prepojenie na základe po
 ---
 ## **4 Vizualizácia dát**
 ---
-### **Graf 1: Najviac hodnotené knihy (Top 10 kníh)**
+### **Graf 1: Počty hodnotení filmov**
 Táto vizualizácia zobrazuje počty hodnotení pre všetky filmy, vidíme že najčastejsie hodnotia používatelia filmy ratingom 3
 
 ```sql
@@ -151,8 +151,92 @@ GROUP BY m.title
 ORDER BY avg_rating DESC;
 ```
 
+### **Graf 2: Počty hodnotení použivatelov (Podla vekevej kategorie)**
+Táto vizualizácia zobrazuje počet hodnotení od používatelov rozdelené podla veku
+
+```sql
+SELECT 
+    u.age_group AS age_group,
+    COUNT(r.rating) AS total_ratings
+FROM FACT_RATINGS r
+JOIN DIM_USERS u ON r.userID = u.dim_userId
+GROUP BY u.age_group
+ORDER BY 
+    CASE 
+        WHEN u.age_group = 'Under 18' THEN 1
+        WHEN u.age_group = '18-24' THEN 2
+        WHEN u.age_group = '25-34' THEN 3
+        WHEN u.age_group = '35-44' THEN 4
+        WHEN u.age_group = '45-54' THEN 5
+        WHEN u.age_group = '55+' THEN 6
+        ELSE 7
+    END;
+```
+
+### **Graf 3: Najpopulárnejšie žánre (Podla Počtu hodnotení)**
+Táto vizualizácia zobrazuje počet hodnotení pre rozdielne žánre
+
+```sql
+SELECT 
+    g.name AS genre,
+    COUNT(r.rating) AS total_ratings
+FROM FACT_RATINGS r
+JOIN DIM_MOVIES m ON r.movieID = m.dim_movieId
+JOIN genre_movies_staging gm ON gm.movieId = m.dim_movieId
+JOIN genre_staging g ON g.genreId = gm.genreId
+GROUP BY g.name
+ORDER BY total_ratings DESC;
+```
 
 
+### **Graf 4: Najpopulárnejšie žánre (Podla Počtu filmov)**
+Táto vizualizácia zobrazuje počet filmov pre rozdielne žánre
+
+```sql
+SELECT 
+    g.name AS genre,
+    COUNT(r.rating) AS total_ratings
+FROM FACT_RATINGS r
+JOIN DIM_MOVIES m ON r.movieID = m.dim_movieId
+JOIN genre_movies_staging gm ON gm.movieId = m.dim_movieId
+JOIN genre_staging g ON g.genreId = gm.genreId
+GROUP BY g.name
+ORDER BY total_ratings DESC;
+```
+
+
+
+
+### **Graf 5: Priemerný počet hodnotení pre film (Podľa žanrov)**
+
+
+```sql
+SELECT 
+    g.name AS genre,
+    COUNT(r.ratingId)/1000 AS total_ratings,
+    COUNT(DISTINCT gm.movieId) AS total_movies,
+    ROUND(COUNT(r.ratingId) * 1.0 / COUNT(DISTINCT gm.movieId), 2) AS avg_ratings_per_movie
+FROM genre_staging g
+JOIN genre_movies_staging gm ON g.genreId = gm.genreId
+JOIN movies_staging m ON gm.movieId = m.movieId
+JOIN ratings_staging r ON m.movieId = r.movieId
+GROUP BY g.name
+ORDER BY avg_ratings_per_movie DESC;
+```
+
+
+### **Graf 6: Priemerné hodnotenie podla vekovej skupiny**
+
+
+```sql
+SELECT 
+    u.age_group,
+    ROUND(AVG(r.rating), 2) AS avg_rating
+FROM FACT_RATINGS r
+JOIN DIM_USERS u ON r.userID = u.dim_userId
+GROUP BY u.age_group
+ORDER BY avg_rating DESC;
+```
 
 
 
