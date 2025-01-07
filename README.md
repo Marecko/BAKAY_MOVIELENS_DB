@@ -256,5 +256,5 @@ GROUP BY u.age_group
 ORDER BY avg_rating DESC;
 ```
 
-
+####Vytvoril: Marek Bakay
 
