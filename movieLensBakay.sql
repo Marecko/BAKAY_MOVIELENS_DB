@@ -35,7 +35,7 @@ CREATE TABLE age_staging (
 
 
 -- Vytvorenie tabuľky tags (staging)
-CREATE TABLE tags_staging (
+CREATE or ALTER TABLE tags_staging (
     tagsId INT PRIMARY KEY ,
     userId INT,
     movieId INT,
@@ -49,6 +49,7 @@ CREATE TABLE ratings_staging (
     userId INT,
     movieId INT,
     rating INT,
+    rated_at DATE,
     FOREIGN KEY (userId) REFERENCES users_staging(userId),
     FOREIGN KEY (movieId) REFERENCES movies_staging(movieId)
 );
@@ -97,8 +98,8 @@ FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 0);
 
 INSERT INTO occupation_staging VALUES (0,'Others/Not Specified'),(1,'Administrator'),(2,'Artist'),(3,'Doctor'),(4,'Educator'),(5,'Engineer'),(6,'Entertainment'),(7,'Executive'),(8,'Healthcare'),(9,'Homemaker'),(10,'Lawyer'),(11,'Librarian'),(12,'Marketing'),(13,'None'),(14,'Other'),(15,'Programmer'),(16,'Retired'),(17,'Salesman'),(18,'Scientist'),(19,'Student'),(20,'Technician'),(21,'Writer');
 
-COPY INTO ratings_staging (userId, movieId, rating)
-FROM @my_stage/cleaned_file.dat
+COPY INTO ratings_staging (userId,movieId,rating,rated_at)
+FROM @my_stage/ratings.dat
 FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' FIELD_DELIMITER = '::');
 
 COPY INTO tags_staging
@@ -147,6 +148,29 @@ SELECT DISTINCT
 FROM movies_staging as m
 JOIN genre_movies_staging as gm ON m.movieId = gm.movieId
 JOIN genre_staging as g ON gm.genreId = g.genreId;
+
+CREATE TABLE dim_date AS
+SELECT
+    ROW_NUMBER() OVER (ORDER BY CAST(rated_at AS DATE)) AS dim_dateID, 
+    CAST(rated_at AS DATE) AS date,                                   
+    DATE_PART(day, rated_at) AS day,                                  
+    DATE_PART(dow, rated_at) + 1 AS dayOfWeek,                        
+    CASE DATE_PART(dow, rated_at) + 1                                 
+        WHEN 1 THEN 'Pondelok'
+        WHEN 2 THEN 'Utorok'
+        WHEN 3 THEN 'Streda'
+        WHEN 4 THEN 'Štvrtok'
+        WHEN 5 THEN 'Piatok'
+        WHEN 6 THEN 'Sobota'
+        WHEN 7 THEN 'Nedeľa'
+    END AS dayOfWeekAsString,
+    DATE_PART(month, rated_at) AS month,                              
+    DATE_PART(year, rated_at) AS year,                                
+    DATE_PART(quarter, rated_at) AS quarter                           
+FROM ratings_staging;
+
+
+
 
 
 CREATE TABLE FACT_RATINGS AS
