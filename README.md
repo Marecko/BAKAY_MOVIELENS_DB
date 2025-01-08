@@ -163,9 +163,9 @@ JOIN dim_users as u ON u.dim_userId = r.userID;     -- Prepojenie na základe po
 ## **4 Vizualizácia dát**
 <p align="center">DashBoard Obsahuje 6 vizualizácií ktoré nám objasňujú určité metriky našich dát
 
-  <img src="https://github.com/Marecko/BAKAY_MOVIELENS_DB/blob/main/grafy.png" alt="Star Schema">
+  <img src="https://github.com/Marecko/BAKAY_MOVIELENS_DB/blob/main/grafy.png" alt="Grazy">
   <br>
-  <em>Obrázok 2 Schéma hviezdy pre MovieLens</em>
+  <em>Obrázok 3 ktoré nám objasňujú určité metriky našich dát </em>
 </p>
 
 ---
