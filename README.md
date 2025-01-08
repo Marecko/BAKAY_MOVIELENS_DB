@@ -38,12 +38,12 @@ Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na **e
 
 Navrhnutý bol **hviezdicový model (star schema)**, pre efektívnu analýzu kde centrálny bod predstavuje faktová tabuľka **`fact_ratings`**, ktorá je prepojená s nasledujúcimi dimenziami:
 - **`dim_movie`**: Obsahuje podrobné informácie o knihách (názov, rok vydania, žáner).
-- **`dim_users`**: Obsahuje demografické údaje o používateľoch, ako sú vekové kategórie, pohlavie, povolanie a vzdelanie.
+- **`dim_users`**: Obsahuje demografické údaje o používateľoch, ako sú vekové kategórie, pohlavie, povolanie.
 - **`dim_date`**: Zahrňuje informácie o dátumoch hodnotení (deň, mesiac, rok).
 
 Štruktúra hviezdicového modelu je znázornená na diagrame nižšie. Diagram ukazuje prepojenia medzi faktovou tabuľkou a dimenziami, čo zjednodušuje pochopenie a implementáciu modelu.
 
-<p align="center">![star_schema_MovieLens](https://github.com/user-attachments/assets/55c6ac64-c17c-4ef2-910c-15300545f4f1)
+<p align="center">
 
   <img src="https://github.com/Marecko/BAKAY_MOVIELENS_DB/blob/main/star_schema_MovieLens.png" alt="Star Schema">
   <br>
@@ -119,6 +119,30 @@ FROM movies_staging as m
 JOIN genre_movies_staging as gm ON m.movieId = gm.movieId
 JOIN genre_staging as g ON gm.genreId = g.genreId;
 ```
+
+Dimenzia `dim_date` obsahuje údaje o čase, dni, mesiaci(Datum) hodnotenia.
+```sql 
+CREATE TABLE dim_date AS
+SELECT
+    ROW_NUMBER() OVER (ORDER BY CAST(rated_at AS DATE)) AS dim_dateID, 
+    CAST(rated_at AS DATE) AS date,                                   
+    DATE_PART(day, rated_at) AS day,                                  
+    DATE_PART(dow, rated_at) + 1 AS dayOfWeek,                        
+    CASE DATE_PART(dow, rated_at) + 1                                 
+        WHEN 1 THEN 'Pondelok'
+        WHEN 2 THEN 'Utorok'
+        WHEN 3 THEN 'Streda'
+        WHEN 4 THEN 'Štvrtok'
+        WHEN 5 THEN 'Piatok'
+        WHEN 6 THEN 'Sobota'
+        WHEN 7 THEN 'Nedeľa'
+    END AS dayOfWeekAsString,
+    DATE_PART(month, rated_at) AS month,                              
+    DATE_PART(year, rated_at) AS year,                                
+    DATE_PART(quarter, rated_at) AS quarter                           
+FROM ratings_staging;
+```
+
 
 Faktová tabuľka `fact_ratings` obsahuje záznamy o hodnoteniach a prepojenia na všetky dimenzie. Obsahuje kľúčové metriky, ako je hodnota hodnotenia.
 ```sql
@@ -256,5 +280,7 @@ GROUP BY u.age_group
 ORDER BY avg_rating DESC;
 ```
 
-####Vytvoril: Marek Bakay
+Vytvoril: Marek Bakay
+SNAIL_MOVIELENS_DB
+https://app.snowflake.com/sfedu02/nib08201/w3NztVLoNXMW#query
 
